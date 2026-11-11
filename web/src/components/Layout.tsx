@@ -55,6 +55,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
     group: 'العمليات',
     items: [
       { to: '/receiving', label: 'الاستلام', icon: Truck },
+      { to: '/quality', label: 'فحص الجودة', icon: ShieldCheck },
       { to: '/sales-orders', label: 'أوامر البيع', icon: ClipboardList },
       { to: '/picking', label: 'التجهيز والشحن', icon: PackageSearch },
       { to: '/wave-picking', label: 'موجات الالتقاط', icon: Layers },

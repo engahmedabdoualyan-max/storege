@@ -15,6 +15,7 @@ import { processPendingDeliveries } from './lib/webhooks'
 import { authRoutes } from './routes/auth'
 import { userRoutes } from './routes/users'
 import { itemRoutes } from './routes/items'
+import { qcRoutes } from './routes/qc'
 import { warehouseRoutes } from './routes/warehouses'
 import { inventoryRoutes } from './routes/inventory'
 import { partnerRoutes } from './routes/partners'
@@ -24,7 +25,9 @@ import { transferRoutes } from './routes/transfers'
 import { cycleCountRoutes } from './routes/cycleCounts'
 import { invoiceRoutes } from './routes/invoices'
 import { dashboardRoutes } from './routes/dashboard'
+import { dockRoutes } from './routes/docks'
 import { reportRoutes } from './routes/reports'
+import { returnRoutes } from './routes/returns'
 import { platformRoutes } from './routes/platform'
 
 const PUBLIC_PATHS = new Set(['/api/auth/login', '/api/health', '/api/settings/public'])
@@ -140,6 +143,7 @@ app.get('/api/health', async () => {
 await app.register(authRoutes)
 await app.register(userRoutes)
 await app.register(itemRoutes)
+await app.register(qcRoutes)
 await app.register(warehouseRoutes)
 await app.register(inventoryRoutes)
 await app.register(partnerRoutes)
@@ -149,7 +153,9 @@ await app.register(transferRoutes)
 await app.register(cycleCountRoutes)
 await app.register(invoiceRoutes)
 await app.register(dashboardRoutes)
+await app.register(dockRoutes)
 await app.register(reportRoutes)
+await app.register(returnRoutes)
 await app.register(platformRoutes)
 
 const here = path.dirname(fileURLToPath(import.meta.url))

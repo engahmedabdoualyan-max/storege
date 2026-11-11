@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { CheckSquare, Printer, ScanBarcode, Square, Tag } from 'lucide-react'
+import { CheckSquare, Download, Printer, ScanBarcode, Square, Tag } from 'lucide-react'
 import {
   Alert,
   Badge,
@@ -172,6 +172,22 @@ export default function Labels() {
     document.body.classList.add('printing-labels')
     window.setTimeout(() => window.print(), 120)
   }
+  const downloadZpl = () => {
+    if (!previewLabels.length) {
+      toast.push(t('اختر عنصرًا واحدًا على الأقل'), 'warning')
+      return
+    }
+    const zpl = previewLabels
+      .map((label) => `^XA\n^CF0,28\n^FO10,10^FD${String(label.title).replace(/\^/g, '')}^FS\n^FO10,40^FD${label.subtitle || ''}^FS\n^BCN,60,Y,N,N^FD${label.code}^FS\n^XZ`)
+      .join('\n')
+    const blob = new Blob([zpl], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'storege-labels.zpl'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   const totalSelected = selectedItems.length + selectedLocations.length
 
@@ -181,9 +197,14 @@ export default function Labels() {
         title={t('الباركود والليبلات')}
         subtitle={t('تصميم وطباعة ليبلات الأصناف والمواقع')}
         actions={
-          <Button onClick={print} disabled={!previewLabels.length}>
-            <Printer size={16} /> {t('طباعة الليبلات')}
-          </Button>
+          <>
+            <Button onClick={print} disabled={!previewLabels.length}>
+              <Printer size={16} /> {t('طباعة الليبلات')}
+            </Button>
+            <Button variant="secondary" onClick={downloadZpl} disabled={!previewLabels.length}>
+              <Download size={16} /> {t('ZPL حراري')}
+            </Button>
+          </>
         }
       />
 

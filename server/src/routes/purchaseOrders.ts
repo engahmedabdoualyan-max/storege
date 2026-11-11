@@ -19,6 +19,7 @@ const poSchema = z.object({
   supplierId: z.string().optional().nullable(),
   warehouseId: z.string(),
   expectedAt: z.string().optional().nullable(),
+  asnNumber: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   taxRate: z.coerce.number().min(0).optional(),
   lines: z.array(lineSchema).min(1),
@@ -115,6 +116,7 @@ export async function purchaseOrderRoutes(app: FastifyInstance) {
           supplierId: body.supplierId || null,
           warehouseId: body.warehouseId,
           expectedAt: body.expectedAt ? new Date(body.expectedAt) : null,
+          asnNumber: body.asnNumber || null,
           notes: body.notes || null,
           createdById: req.auth!.id,
           ...sums,
@@ -155,6 +157,7 @@ export async function purchaseOrderRoutes(app: FastifyInstance) {
           ...(body.expectedAt !== undefined
             ? { expectedAt: body.expectedAt ? new Date(body.expectedAt) : null }
             : {}),
+          ...(body.asnNumber !== undefined ? { asnNumber: body.asnNumber } : {}),
           ...(body.notes !== undefined ? { notes: body.notes } : {}),
           ...sums,
         },

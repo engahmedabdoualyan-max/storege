@@ -23,3 +23,5 @@ android/build/
 *.jks
 .vercel
 .env.local
+storege-accounts.xlsx
+*.xlsx

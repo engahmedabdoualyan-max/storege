@@ -566,6 +566,9 @@ export async function shipOrder(input: {
   carrier?: string
   tracking?: string
   notes?: string
+  reason?: string
+  vehicleRef?: string
+  issuedTo?: string
   userId?: string | null
   userName?: string | null
 }) {
@@ -619,6 +622,9 @@ export async function shipOrder(input: {
         carrier: input.carrier,
         tracking: input.tracking,
         notes: input.notes,
+        reason: input.reason,
+        vehicleRef: input.vehicleRef,
+        issuedTo: input.issuedTo,
         createdById: input.userId || null,
       },
     })

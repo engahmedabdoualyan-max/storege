@@ -294,6 +294,9 @@ export async function salesOrderRoutes(app: FastifyInstance) {
         carrier: z.string().optional(),
         tracking: z.string().optional(),
         notes: z.string().optional(),
+        reason: z.string().optional(),
+        vehicleRef: z.string().optional(),
+        issuedTo: z.string().optional(),
       }),
       req.body,
     )

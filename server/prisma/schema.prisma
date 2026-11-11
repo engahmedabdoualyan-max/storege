@@ -375,6 +375,9 @@ model Shipment {
   carrier     String?
   tracking    String?
   notes       String?
+  reason      String?
+  vehicleRef  String?
+  issuedTo    String?
   status      String     @default("SHIPPED")
   createdById String?
   shippedAt   DateTime   @default(now())

@@ -1,5 +1,5 @@
-import { BookOpen, ExternalLink } from 'lucide-react'
-import { Card, CardHeader, PageHeader } from '../components/ui'
+import { BookOpen, Download, ExternalLink, Printer } from 'lucide-react'
+import { Button, Card, CardHeader, PageHeader } from '../components/ui'
 import { useI18n } from '../lib/i18n'
 import { useCompany } from '../lib/company'
 
@@ -34,6 +34,28 @@ export default function Manual() {
       <PageHeader
         title={isAr ? 'كتيب استخدام Storege WMS' : 'Storege WMS User Manual'}
         subtitle={isAr ? `دليل مختصر لـ ${name}` : `Quick guide for ${name}`}
+        actions={
+          <>
+            <Button variant="secondary" onClick={() => window.print()}>
+              <Printer size={15} /> {isAr ? 'طباعة / PDF' : 'Print / PDF'}
+            </Button>
+            <a href={isAr ? '/storege-manual-ar.pdf' : '/storege-manual-en.pdf'} download className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50">
+              <Download size={15} /> {isAr ? 'تحميل PDF' : 'Download PDF'}
+            </a>
+            <Button variant="secondary" onClick={() => {
+              const html = `<!DOCTYPE html><html lang="${isAr ? 'ar' : 'en'}" dir="${isAr ? 'rtl' : 'ltr'}"><head><meta charset="utf-8"><title>Storege WMS Manual</title><style>body{font-family:sans-serif;padding:24px;line-height:1.7}h1{color:#0f172a}h2{margin-top:18px;color:#1e3a8a}.card{border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin:10px 0}</style></head><body><h1>${isAr ? 'كتيب استخدام Storege WMS' : 'Storege WMS User Manual'}</h1>${sections.map((x) => `<div class="card"><h2>${x.title}</h2><p>${x.body}</p></div>`).join('')}<p style="margin-top:24px;font-size:12px;color:#64748b">FimtoSoft — www.fimtosoft.com</p></body></html>`
+              const blob = new Blob([html], { type: 'text/html' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = isAr ? 'storege-manual-ar.html' : 'storege-manual-en.html'
+              a.click()
+              URL.revokeObjectURL(url)
+            }}>
+              <Download size={15} /> {isAr ? 'تحميل HTML' : 'Download HTML'}
+            </Button>
+          </>
+        }
       />
       <div className="grid gap-4 md:grid-cols-2">
         {sections.map((section) => (

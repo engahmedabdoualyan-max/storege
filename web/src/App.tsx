@@ -32,6 +32,7 @@ import Users from './pages/Users'
 import Settings from './pages/Settings'
 import Audit from './pages/Audit'
 import Integrations from './pages/Integrations'
+import Manual from './pages/Manual'
 import Handheld from './pages/Handheld'
 
 function Splash() {

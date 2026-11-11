@@ -442,14 +442,30 @@ export default function Receiving() {
       >
         <div className="space-y-3">
           <Field label={t('إلى موقع')} required>
-            <Select value={putawayLocation} onChange={(event) => setPutawayLocation(event.target.value)}>
-              <option value="">{t('اختر الموقع')}</option>
-              {(putawayQuery.data?.locations || []).map((location) => (
-                <option key={location.id} value={location.id}>
-                  {location.code} — {location.name}
-                </option>
-              ))}
-            </Select>
+            <div className="flex gap-2">
+              <Select value={putawayLocation} onChange={(event) => setPutawayLocation(event.target.value)} className="flex-1">
+                <option value="">{t('اختر الموقع')}</option>
+                {(putawayQuery.data?.locations || []).map((location) => (
+                  <option key={location.id} value={location.id}>
+                    {location.code} — {location.name}
+                  </option>
+                ))}
+              </Select>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={async () => {
+                  try {
+                    const res = await api.get<{ locationId: string }>(`/api/putaway/suggest?itemId=${putawayRow?.itemId}&warehouseId=${warehouseId}`)
+                    if (res.locationId) setPutawayLocation(res.locationId)
+                  } catch (e) {
+                    /* ignore */
+                  }
+                }}
+              >
+                {t('اقتراح')}
+              </Button>
+            </div>
           </Field>
           <Field label={t('الكمية')} required>
             <Input type="number" step="0.001" value={putawayQty} onChange={(event) => setPutawayQty(event.target.value)} />

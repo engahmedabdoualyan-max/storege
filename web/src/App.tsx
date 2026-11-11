@@ -27,6 +27,7 @@ import Invoices from './pages/Invoices'
 import InvoiceView from './pages/InvoiceView'
 import Reports from './pages/Reports'
 import Reconciliation from './pages/Reconciliation'
+import WavePicking from './pages/WavePicking'
 import Labels from './pages/Labels'
 import Users from './pages/Users'
 import Settings from './pages/Settings'
@@ -89,6 +90,7 @@ export default function App() {
         <Route path="/sales-orders" element={<SalesOrders />} />
         <Route path="/sales-orders/:id" element={<SalesOrderDetail />} />
         <Route path="/picking" element={<Picking />} />
+        <Route path="/wave-picking" element={<WavePicking />} />
         <Route path="/picking/:id" element={<PickingSession />} />
         <Route path="/shipping" element={<Shipping />} />
         <Route path="/transfers" element={<Transfers />} />

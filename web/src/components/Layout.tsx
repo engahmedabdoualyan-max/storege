@@ -55,6 +55,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
       { to: '/receiving', label: 'الاستلام', icon: Truck },
       { to: '/sales-orders', label: 'أوامر البيع', icon: ClipboardList },
       { to: '/picking', label: 'التجهيز والشحن', icon: PackageSearch },
+      { to: '/wave-picking', label: 'موجات الالتقاط', icon: Layers },
       { to: '/transfers', label: 'التحويلات', icon: ArrowLeftRight },
       { to: '/counts', label: 'الجرد', icon: ClipboardCheck },
     ],

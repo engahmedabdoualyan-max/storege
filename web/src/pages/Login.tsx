@@ -40,7 +40,7 @@ export default function Login() {
       await login(email.trim(), password)
       navigate(params.get('next') || '/dashboard', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('خطأ في تسجيل الدخول'))
+      setError(err instanceof Error ? String(err.message) : t('خطأ في تسجيل الدخول'))
     } finally {
       setLoading(false)
     }

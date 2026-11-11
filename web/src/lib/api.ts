@@ -77,7 +77,7 @@ export async function request<T>(
       }
       throw new ApiError(
         response.status,
-        payload?.error || `Request failed (${response.status})`,
+        (typeof payload?.error === 'string' ? payload.error : payload?.error ? JSON.stringify(payload.error) : `Request failed (${response.status})`),
         payload?.details,
       )
     }

@@ -101,6 +101,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
       { to: '/settings', label: 'الإعدادات', icon: Settings, roles: ['ADMIN', 'MANAGER'] },
       { to: '/audit', label: 'سجل النشاط', icon: Activity, roles: ['ADMIN', 'MANAGER'] },
       { to: '/integrations', label: 'التكاملات', icon: Plug, roles: ['ADMIN', 'MANAGER'] },
+      { to: '/manual', label: 'كتيب الاستخدام', icon: FileText },
     ],
   },
 ]

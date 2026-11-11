@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CheckCircle2, PackageCheck, Ship, Truck } from 'lucide-react'
+import { CheckCircle2, PackageCheck, Printer, Ship, Truck } from 'lucide-react'
 import {
   Alert,
   Badge,
@@ -37,6 +37,10 @@ export default function Shipping() {
   const [carrier, setCarrier] = useState('')
   const [tracking, setTracking] = useState('')
   const [notes, setNotes] = useState('')
+  const [reason, setReason] = useState('')
+  const [vehicleRef, setVehicleRef] = useState('')
+  const [issuedTo, setIssuedTo] = useState('')
+  const [permitShipment, setPermitShipment] = useState<Shipment | null>(null)
 
   const queueQuery = useQuery({
     queryKey: ['shipping-queue', warehouseId, search],
@@ -80,6 +84,9 @@ export default function Shipping() {
         carrier: carrier || undefined,
         tracking: tracking || undefined,
         notes: notes || undefined,
+        reason: reason || undefined,
+        vehicleRef: vehicleRef || undefined,
+        issuedTo: issuedTo || undefined,
       }),
     onSuccess: () => {
       toast.push(t('تم شحن الأمر'))
@@ -87,6 +94,9 @@ export default function Shipping() {
       setCarrier('')
       setTracking('')
       setNotes('')
+      setReason('')
+      setVehicleRef('')
+      setIssuedTo('')
       refresh()
     },
     onError: (error: Error) => toast.push(error.message, 'error'),
@@ -203,7 +213,7 @@ export default function Shipping() {
           )
         ) : (
           <DataTable
-            headers={[t('أمر البيع'), t('العميل'), t('شركة الشحن'), t('رقم التتبع'), t('التاريخ')]}
+            headers={[t('أمر البيع'), t('العميل'), t('السبب/المركبة'), t('شركة الشحن'), t('التاريخ'), t('إذن صرف')]}
             loading={shipmentsQuery.isLoading}
             rowCount={shipmentsQuery.data?.items?.length}
           >
@@ -215,9 +225,14 @@ export default function Shipping() {
                   </Link>
                 </td>
                 <td className="px-3.5 py-2.5 text-xs text-slate-700">{shipment.so?.customer?.name || t('عميل نقدي')}</td>
+                <td className="px-3.5 py-2.5 text-xs text-slate-600">{shipment.reason || shipment.vehicleRef || '—'}</td>
                 <td className="px-3.5 py-2.5 text-xs text-slate-600">{shipment.carrier || '—'}</td>
-                <td className="px-3.5 py-2.5 font-mono text-[11px] text-slate-500">{shipment.tracking || '—'}</td>
                 <td className="px-3.5 py-2.5 text-[11px] text-slate-400">{dateTime(shipment.shippedAt, lang)}</td>
+                <td className="px-3.5 py-2.5">
+                  <Button size="sm" variant="secondary" onClick={() => setPermitShipment(shipment)}>
+                    <Printer size={13} /> {t('طباعة')}
+                  </Button>
+                </td>
               </tr>
             ))}
           </DataTable>
@@ -247,10 +262,41 @@ export default function Shipping() {
           <Field label={t('رقم التتبع')}>
             <Input value={tracking} onChange={(event) => setTracking(event.target.value)} dir="ltr" />
           </Field>
+          <Field label={t('سبب الصرف (مثال: قطع غيار مركبة)')}>
+            <Input value={reason} onChange={(event) => setReason(event.target.value)} placeholder={t('سبب الصرف')} />
+          </Field>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label={t('المركبة/المعدة')}>
+              <Input value={vehicleRef} onChange={(event) => setVehicleRef(event.target.value)} placeholder="رقم اللوحة/المعدة" dir="ltr" />
+            </Field>
+            <Field label={t('المُسلَّم إلى')}>
+              <Input value={issuedTo} onChange={(event) => setIssuedTo(event.target.value)} />
+            </Field>
+          </div>
           <Field label={t('ملاحظات')}>
             <Textarea rows={2} value={notes} onChange={(event) => setNotes(event.target.value)} />
           </Field>
           <Badge tone="green">{t('سيتم خصم الكميات من منطقة الشحن')}</Badge>
+        </div>
+      </Modal>
+      <Modal open={Boolean(permitShipment)} onClose={() => setPermitShipment(null)} title={t('إذن صرف (Issue Permit)')} subtitle={permitShipment?.so?.number}>
+        <div className="print-area space-y-3 text-sm">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+            <p className="font-extrabold text-slate-900">{t('إذن صرف من المخزن')}</p>
+            <p className="text-xs text-slate-400">{permitShipment ? dateTime(permitShipment.shippedAt, lang) : ''}</p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <p><b>{t('رقم الأمر')}:</b> {permitShipment?.so?.number}</p>
+            <p><b>{t('العميل')}:</b> {permitShipment?.so?.customer?.name || t('عميل نقدي')}</p>
+            <p><b>{t('السبب')}:</b> {permitShipment?.reason || '—'}</p>
+            <p><b>{t('المركبة/المعدة')}:</b> {permitShipment?.vehicleRef || '—'}</p>
+            <p><b>{t('المُسلَّم إلى')}:</b> {permitShipment?.issuedTo || '—'}</p>
+            <p><b>{t('شركة الشحن')}:</b> {permitShipment?.carrier || '—'}</p>
+          </div>
+          <p className="text-[11px] text-slate-400">{t('هذا الإذن يُستخدم لتوثيق صرف قطع الغيار/المستلزمات من المخزن.')}</p>
+          <div className="flex justify-end">
+            <Button onClick={() => window.print()}><Printer size={15} /> {t('طباعة')}</Button>
+          </div>
         </div>
       </Modal>
     </div>

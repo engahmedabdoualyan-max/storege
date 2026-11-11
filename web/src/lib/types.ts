@@ -221,6 +221,9 @@ export type Shipment = {
   carrier?: string | null
   tracking?: string | null
   notes?: string | null
+  reason?: string | null
+  vehicleRef?: string | null
+  issuedTo?: string | null
   status: string
   shippedAt: string
   so?: SalesOrder

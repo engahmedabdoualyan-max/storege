@@ -27,6 +27,7 @@ import Invoices from './pages/Invoices'
 import InvoiceView from './pages/InvoiceView'
 import Reports from './pages/Reports'
 import Reconciliation from './pages/Reconciliation'
+import Docks from './pages/Docks'
 import Returns from './pages/Returns'
 import WavePicking from './pages/WavePicking'
 import Labels from './pages/Labels'
@@ -95,6 +96,7 @@ export default function App() {
         <Route path="/picking/:id" element={<PickingSession />} />
         <Route path="/shipping" element={<Shipping />} />
         <Route path="/transfers" element={<Transfers />} />
+        <Route path="/docks" element={<Docks />} />
         <Route path="/counts" element={<Counts />} />
         <Route path="/counts/:id" element={<CountDetail />} />
         <Route path="/partners" element={<Partners />} />

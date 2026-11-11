@@ -348,6 +348,15 @@ npm run smoke -- --write   # يختبر أيضًا الكتابة وتكرار X
 ---
 
 
+## التوصيات المنفذة (Phase 1)
+
+- **ZATCA Phase 2:** QR (TLV base64) + XML UBL 2.1 مبسّط، زر في صفحة الفاتورة + تحميل XML.
+- **Wave/Batch Picking:** صفحة `/wave-picking` لتجميع أوامر بيع متعددة في قائمة التقط واحد.
+- **Putaway Suggestion:** `/api/putaway/suggest` + زر «اقتراح» في استلام Putaway.
+- **Thermal Labels:** تصدير ZPL (`storege-labels.zpl`) للطابعات الحرارية.
+- **كتيب الاستخدام:** زر عائم (FAB) + صفحة `/manual` (عربي/إنجليزي حسب اللغة).
+- **Footer:** «تطوير شركة فیمتو سوفت — www.fimtosoft.com».
+
 ## النشر على Vercel
 
 1. **المستودع:** اربط GitHub repo بـ Vercel (Import Project).

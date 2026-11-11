@@ -27,6 +27,7 @@ import Invoices from './pages/Invoices'
 import InvoiceView from './pages/InvoiceView'
 import Reports from './pages/Reports'
 import Reconciliation from './pages/Reconciliation'
+import Returns from './pages/Returns'
 import WavePicking from './pages/WavePicking'
 import Labels from './pages/Labels'
 import Users from './pages/Users'
@@ -101,6 +102,7 @@ export default function App() {
         <Route path="/invoices/:id" element={<InvoiceView />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/reconciliation" element={<Reconciliation />} />
+        <Route path="/returns" element={<Returns />} />
         <Route path="/labels" element={<Labels />} />
         <Route
           path="/users"

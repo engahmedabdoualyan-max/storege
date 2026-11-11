@@ -1,0 +1,23 @@
+node_modules
+dist
+build
+.env
+*.log
+server/prisma/*.db
+server/prisma/*.db-journal
+server/dev.db
+server/prisma/dev.db
+web/dist
+.DS_Store
+coverage
+*.tsbuildinfo
+
+# Android build artifacts
+android/.gradle/
+android/app/build/
+android/build/
+*.apk
+*.apks
+*.aab
+*.keystore
+*.jks

@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Cairo', 'Segoe UI', Tahoma, system-ui, sans-serif;
+  background: #f6f7fb;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: #ffd98a;
+  color: #0f172a;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Label sheet printing ---------------------------------------------------- */
+.label-sheet {
+  display: grid;
+  gap: 4mm;
+  justify-content: start;
+}
+
+.label-card {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  border: 1px solid #cbd5e1;
+  border-radius: 2mm;
+  background: #fff;
+  padding: 2.5mm;
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+@media print {
+  @page {
+    margin: 8mm;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  body.printing-labels * {
+    visibility: hidden !important;
+  }
+
+  body.printing-labels #label-sheet,
+  body.printing-labels #label-sheet * {
+    visibility: visible !important;
+  }
+
+  body.printing-labels #label-sheet {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 2mm;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-area {
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+}

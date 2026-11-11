@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+dist
+**/dist
+.git
+.gitignore
+*.log
+server/prisma/*.db
+server/prisma/*.db-journal
+server/.env
+web/.env.local
+.DS_Store
+coverage

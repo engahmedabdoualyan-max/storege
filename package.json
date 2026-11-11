@@ -1,0 +1,30 @@
+{
+  "name": "storege-wms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Storege WMS - نظام إدارة مخازن احترافي بالباركود وأجهزة الكف",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "setup": "npm install && node scripts/ensure-env.mjs && npm run db:generate && npm run db:push && npm run db:seed",
+    "dev": "node scripts/ensure-env.mjs && concurrently -n api,web -c cyan,magenta \"npm run dev -w server\" \"npm run dev -w web\"",
+    "build": "npm run build -w server && npm run build -w web",
+    "start": "node scripts/ensure-env.mjs && npm run start -w server",
+    "db:generate": "npm run db:generate -w server",
+    "db:push": "npm run db:push -w server",
+    "db:seed": "npm run db:seed -w server",
+    "db:reset": "npm run db:reset -w server",
+    "db:postgres": "node scripts/use-postgres.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "vercel-build": "node scripts/use-postgres.mjs --no-env && prisma generate --schema server/prisma/schema.prisma && npm run build -w web",
+    "android:sync": "npm run build -w web && npx cap sync android"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

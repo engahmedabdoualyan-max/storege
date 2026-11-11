@@ -363,13 +363,14 @@ export function Layout() {
 
         <main className="mx-auto max-w-[1500px] px-4 py-5 lg:px-6 lg:py-6">
           <Outlet />
-        <Link
-          to="/manual"
+        <a
+          href={lang === 'ar' ? '/storege-manual-ar.pdf' : '/storege-manual-en.pdf'}
+          download
           className="fixed bottom-5 end-5 z-50 flex h-12 w-12 animate-bounce items-center justify-center rounded-full bg-brand-950 text-accent-400 shadow-pop ring-4 ring-accent-400/20 transition hover:scale-110"
-          title={t('كتيب الاستخدام')}
+          title={t('تحميل الكتيب (PDF)')}
         >
           <BookOpen size={20} />
-        </Link>
+        </a>
         <footer className="mt-6 border-t border-slate-200/60 px-4 py-3 text-center text-[11px] text-slate-400 print:hidden">
           <div className="flex flex-wrap items-center justify-center gap-3">
             <span className="inline-flex items-center gap-2">

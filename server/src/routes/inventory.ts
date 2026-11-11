@@ -173,6 +173,35 @@ export async function inventoryRoutes(app: FastifyInstance) {
     }
   })
 
+  // Putaway suggestion: consolidate into existing stock, else least-used pick location.
+  app.get('/api/putaway/suggest', async (req) => {
+    const q = req.query as Record<string, string>
+    const itemId = str(q.itemId)
+    const warehouseId = str(q.warehouseId)
+    if (!itemId || !warehouseId) throw new ApiError(400, 'itemId و warehouseId مطلوبان')
+    const existing = await prisma.stock.findFirst({
+      where: { itemId, location: { warehouseId } },
+      orderBy: { quantity: 'desc' },
+      include: { location: true },
+    })
+    if (existing && existing.quantity > 0) {
+      return { locationId: existing.locationId, locationCode: existing.location.code, reason: 'consolidate' }
+    }
+    const locations = await prisma.location.findMany({
+      where: { warehouseId, type: 'PICK', active: true },
+      orderBy: { code: 'asc' },
+    })
+    if (!locations.length) throw new ApiError(404, 'لا توجد مواقع متاحة')
+    const counts = await prisma.stock.groupBy({
+      by: ['locationId'],
+      where: { location: { warehouseId } },
+      _count: { _all: true },
+    })
+    const countMap = new Map(counts.map((c) => [c.locationId, c._count._all]))
+    const sorted = [...locations].sort((a, b) => (countMap.get(a.id) || 0) - (countMap.get(b.id) || 0))
+    return { locationId: sorted[0].id, locationCode: sorted[0].code, reason: 'empty' }
+  })
+
   // Aggregated "total goods" view (whole company, per warehouse and per category).
   app.get('/api/inventory/totals', async (req) => {
     const q = req.query as Record<string, string>

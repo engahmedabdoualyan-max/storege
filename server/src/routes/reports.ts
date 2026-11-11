@@ -105,6 +105,38 @@ export async function reportRoutes(app: FastifyInstance) {
     }
   })
 
+  // Wave / batch picking: aggregated pick list across multiple sales orders.
+  app.get('/api/reports/pick-wave', async (req) => {
+    const q = req.query as Record<string, string>
+    const ids = String(q.ids || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    if (!ids.length) return { lines: [], orders: 0 }
+    const allocations = await prisma.allocation.findMany({
+      where: { soId: { in: ids } },
+      include: { item: true, location: true },
+    })
+    const map = new Map<string, { itemId: string; sku: string; name: string; unit: string; locationId: string; locationCode: string; qty: number; picked: number }>()
+    for (const a of allocations) {
+      const key = `${a.itemId}|${a.locationId}`
+      const cur = map.get(key) || {
+        itemId: a.itemId,
+        sku: a.item.sku,
+        name: a.item.name,
+        unit: a.item.unit,
+        locationId: a.locationId,
+        locationCode: a.location.code,
+        qty: 0,
+        picked: 0,
+      }
+      cur.qty += a.qty
+      cur.picked += a.pickedQty
+      map.set(key, cur)
+    }
+    return { lines: [...map.values()], orders: ids.length }
+  })
+
   // Purchase invoices vs. what was actually received and what is still on hand.
   app.get('/api/reports/purchase-reconciliation', async (req) => {
     const q = req.query as Record<string, string>

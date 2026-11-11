@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import {
   Activity,
   ArrowLeft,
+  ArrowDownToLine,
   ArrowLeftRight,
   BarChart3,
   CalendarClock,
@@ -69,6 +70,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
     group: 'المخزون',
     items: [
       { to: '/inventory', label: 'المخزون', icon: Boxes },
+      { to: '/replenishment', label: 'إعادة التعبئة', icon: ArrowDownToLine },
       { to: '/totals', label: 'إجمالي البضائع', icon: Layers },
       { to: '/items', label: 'الأصناف', icon: Tag },
       { to: '/locations', label: 'المواقع والرفوف', icon: MapPin },

@@ -27,6 +27,7 @@ import Invoices from './pages/Invoices'
 import InvoiceView from './pages/InvoiceView'
 import Reports from './pages/Reports'
 import Reconciliation from './pages/Reconciliation'
+import Replenishment from './pages/Replenishment'
 import Quality from './pages/Quality'
 import Docks from './pages/Docks'
 import Returns from './pages/Returns'
@@ -105,6 +106,7 @@ export default function App() {
         <Route path="/invoices/:id" element={<InvoiceView />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/reconciliation" element={<Reconciliation />} />
+        <Route path="/replenishment" element={<Replenishment />} />
         <Route path="/quality" element={<Quality />} />
         <Route path="/returns" element={<Returns />} />
         <Route path="/labels" element={<Labels />} />

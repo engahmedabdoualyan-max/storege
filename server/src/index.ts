@@ -1,7 +1,7 @@
-import { buildApp } from './app'
-import { env } from './lib/env'
-import { prisma } from './lib/prisma'
-import { processPendingDeliveries } from './lib/webhooks'
+import { buildApp } from './app.js'
+import { env } from './lib/env.js'
+import { prisma } from './lib/prisma.js'
+import { processPendingDeliveries } from './lib/webhooks.js'
 
 const app = await buildApp()
 

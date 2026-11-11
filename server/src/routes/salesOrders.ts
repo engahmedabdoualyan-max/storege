@@ -1,12 +1,12 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
-import { audit } from '../lib/audit'
-import { ApiError, pagination, parse, str } from '../lib/http'
-import { canWrite } from '../lib/auth'
-import { nextNumber } from '../lib/numbers'
-import { getSettings } from '../lib/settings'
-import { emitEvent } from '../lib/webhooks'
+import { prisma } from '../lib/prisma.js'
+import { audit } from '../lib/audit.js'
+import { ApiError, pagination, parse, str } from '../lib/http.js'
+import { canWrite } from '../lib/auth.js'
+import { nextNumber } from '../lib/numbers.js'
+import { getSettings } from '../lib/settings.js'
+import { emitEvent } from '../lib/webhooks.js'
 import {
   allocateOrder,
   cancelOrder,
@@ -14,7 +14,7 @@ import {
   pickLine,
   shipOrder,
   round3,
-} from '../lib/inventory'
+} from '../lib/inventory.js'
 
 const soLineSchema = z.object({
   itemId: z.string(),

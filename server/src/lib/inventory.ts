@@ -1,6 +1,6 @@
 import type { Prisma } from '@prisma/client'
-import { prisma } from './prisma'
-import { ApiError } from './http'
+import { prisma } from './prisma.js'
+import { ApiError } from './http.js'
 
 type Db = Prisma.TransactionClient
 

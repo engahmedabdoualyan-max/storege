@@ -1,11 +1,11 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
-import { audit } from '../lib/audit'
-import { ApiError, pagination, parse } from '../lib/http'
-import { canWrite } from '../lib/auth'
-import { createCycleCount, submitCycleCount } from '../lib/inventory'
-import { emitEvent } from '../lib/webhooks'
+import { prisma } from '../lib/prisma.js'
+import { audit } from '../lib/audit.js'
+import { ApiError, pagination, parse } from '../lib/http.js'
+import { canWrite } from '../lib/auth.js'
+import { createCycleCount, submitCycleCount } from '../lib/inventory.js'
+import { emitEvent } from '../lib/webhooks.js'
 
 export async function cycleCountRoutes(app: FastifyInstance) {
   app.get('/api/cycle-counts', async (req) => {

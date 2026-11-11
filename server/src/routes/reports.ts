@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
-import { prisma } from '../lib/prisma'
-import { round3 } from '../lib/inventory'
+import { prisma } from '../lib/prisma.js'
+import { round3 } from '../lib/inventory.js'
 
 function dateRange(from?: string, to?: string) {
   const start = from ? new Date(from) : new Date(Date.now() - 1000 * 60 * 60 * 24 * 30)

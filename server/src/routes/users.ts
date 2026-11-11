@@ -1,10 +1,10 @@
 import type { FastifyInstance } from 'fastify'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
-import { audit } from '../lib/audit'
-import { ApiError, pagination, parse } from '../lib/http'
-import { adminOnly, requireRole } from '../lib/auth'
+import { prisma } from '../lib/prisma.js'
+import { audit } from '../lib/audit.js'
+import { ApiError, pagination, parse } from '../lib/http.js'
+import { adminOnly, requireRole } from '../lib/auth.js'
 
 const userSchema = z.object({
   name: z.string().min(2),

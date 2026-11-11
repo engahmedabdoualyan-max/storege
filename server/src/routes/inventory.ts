@@ -1,12 +1,12 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
-import { audit } from '../lib/audit'
-import { ApiError, num, pagination, parse, str } from '../lib/http'
-import { canWrite } from '../lib/auth'
-import { adjustStock, consumeAt, moveStock } from '../lib/inventory'
-import { emitEvent } from '../lib/webhooks'
-import { getSettings } from '../lib/settings'
+import { prisma } from '../lib/prisma.js'
+import { audit } from '../lib/audit.js'
+import { ApiError, num, pagination, parse, str } from '../lib/http.js'
+import { canWrite } from '../lib/auth.js'
+import { adjustStock, consumeAt, moveStock } from '../lib/inventory.js'
+import { emitEvent } from '../lib/webhooks.js'
+import { getSettings } from '../lib/settings.js'
 
 export async function inventoryRoutes(app: FastifyInstance) {
   app.get('/api/inventory', async (req) => {
@@ -200,6 +200,82 @@ export async function inventoryRoutes(app: FastifyInstance) {
     const countMap = new Map(counts.map((c) => [c.locationId, c._count._all]))
     const sorted = [...locations].sort((a, b) => (countMap.get(a.id) || 0) - (countMap.get(b.id) || 0))
     return { locationId: sorted[0].id, locationCode: sorted[0].code, reason: 'empty' }
+  })
+
+  // Replenishment suggestions: move stock from bulk/reserve to pick face.
+  app.get('/api/replenishment', async (req) => {
+    const q = req.query as Record<string, string>
+    const warehouseId = str(q.warehouseId)
+    if (!warehouseId) throw new ApiError(400, 'warehouseId مطلوب')
+    const items = await prisma.item.findMany({ where: { active: true, minStock: { gt: 0 } } })
+    const stocks = await prisma.stock.findMany({ where: { location: { warehouseId } }, include: { location: true } })
+    const totals = new Map<string, number>()
+    for (const s of stocks) totals.set(s.itemId, (totals.get(s.itemId) || 0) + s.quantity)
+    const locations = await prisma.location.findMany({ where: { warehouseId, type: 'PICK', active: true }, orderBy: { code: 'asc' } })
+    const counts = await prisma.stock.groupBy({ by: ['locationId'], where: { location: { warehouseId } }, _count: { _all: true } })
+    const countMap = new Map(counts.map((c) => [c.locationId, c._count._all]))
+    const sortedLocs = [...locations].sort((a, b) => (countMap.get(a.id) || 0) - (countMap.get(b.id) || 0))
+    const toLoc = sortedLocs[0]
+    const suggestions = []
+    for (const item of items) {
+      const onHand = totals.get(item.id) || 0
+      if (onHand >= item.minStock) continue
+      const itemStocks = stocks.filter((s) => s.itemId === item.id && s.quantity > 0)
+      if (!itemStocks.length || !toLoc) continue
+      const shortage = Math.max(0, item.minStock - onHand)
+      suggestions.push({
+        itemId: item.id,
+        sku: item.sku,
+        name: item.name,
+        unit: item.unit,
+        onHand,
+        minStock: item.minStock,
+        shortage,
+        qty: shortage || item.reorderQty || 1,
+        fromLocationId: itemStocks[0].locationId,
+        fromLocationCode: itemStocks[0].location.code,
+        toLocationId: toLoc.id,
+        toLocationCode: toLoc.code,
+      })
+    }
+    return { suggestions, count: suggestions.length }
+  })
+
+  // ATP (Available to Promise): on-hand + inbound PO - reserved.
+  app.get('/api/atp/:itemId', async (req) => {
+    const { itemId } = req.params as { itemId: string }
+    const q = req.query as Record<string, string>
+    const warehouseId = str(q.warehouseId)
+    const item = await prisma.item.findUnique({ where: { id: itemId } })
+    if (!item) throw new ApiError(404, 'الصنف غير موجود')
+    const stocks = await prisma.stock.findMany({ where: { itemId, ...(warehouseId ? { location: { warehouseId } } : {}) } })
+    const onHand = stocks.reduce((s, r) => s + r.quantity, 0)
+    const reserved = stocks.reduce((s, r) => s + r.reserved, 0)
+    const poLines = await prisma.purchaseOrderLine.findMany({
+      where: { itemId, po: { status: { in: ['OPEN', 'PARTIAL'] }, ...(warehouseId ? { warehouseId } : {}) } },
+      include: { po: true },
+    })
+    const inbound = poLines.reduce((s, l) => s + (l.qty - l.receivedQty), 0)
+    const atp = Math.max(0, onHand - reserved + inbound)
+    return { itemId, sku: item.sku, name: item.name, onHand, reserved, available: onHand - reserved, inbound, atp }
+  })
+
+  // Simple demand forecast (moving average of shipped qty).
+  app.get('/api/forecast/:itemId', async (req) => {
+    const { itemId } = req.params as { itemId: string }
+    const movements = await prisma.stockMovement.findMany({
+      where: { itemId, type: 'SHIP' },
+      orderBy: { createdAt: 'desc' },
+      take: 90,
+    })
+    const totalShipped = movements.reduce((s, m) => s + m.qty, 0)
+    const days = 90
+    const avgDaily = totalShipped / days
+    const item = await prisma.item.findUnique({ where: { id: itemId } })
+    if (!item) throw new ApiError(404, 'الصنف غير موجود')
+    const suggestedReorder = Math.ceil(avgDaily * (item.shelfLifeDays || 30))
+    const suggestedMin = Math.ceil(avgDaily * 14)
+    return { itemId, sku: item.sku, name: item.name, totalShipped90d: totalShipped, avgDailyDemand: Math.round(avgDaily * 1000) / 1000, suggestedReorderQty: suggestedReorder, suggestedMinStock: suggestedMin }
   })
 
   // Aggregated "total goods" view (whole company, per warehouse and per category).

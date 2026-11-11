@@ -1,4 +1,4 @@
-import { prisma } from './prisma'
+import { prisma } from './prisma.js'
 
 export const DEFAULT_SETTINGS: Record<string, string> = {
   companyName: 'مصنع الرياض للخرسانة وقطع الغيار',

@@ -1,5 +1,5 @@
 import { createHmac } from 'node:crypto'
-import { prisma } from './prisma'
+import { prisma } from './prisma.js'
 
 const MAX_ATTEMPTS = 6
 let running = false

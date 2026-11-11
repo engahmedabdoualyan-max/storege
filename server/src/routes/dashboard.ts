@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
-import { prisma } from '../lib/prisma'
-import { round3 } from '../lib/inventory'
+import { prisma } from '../lib/prisma.js'
+import { round3 } from '../lib/inventory.js'
 
 export async function dashboardRoutes(app: FastifyInstance) {
   app.get('/api/dashboard', async (req) => {

@@ -1,10 +1,10 @@
 import type { FastifyInstance } from 'fastify'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
-import { audit } from '../lib/audit'
-import { ApiError, parse } from '../lib/http'
-import { env } from '../lib/env'
+import { prisma } from '../lib/prisma.js'
+import { audit } from '../lib/audit.js'
+import { ApiError, parse } from '../lib/http.js'
+import { env } from '../lib/env.js'
 
 const loginSchema = z.object({
   email: z.string().email(),

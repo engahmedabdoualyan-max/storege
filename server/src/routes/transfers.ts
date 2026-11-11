@@ -1,12 +1,12 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
-import { audit } from '../lib/audit'
-import { ApiError, pagination, parse } from '../lib/http'
-import { canWrite } from '../lib/auth'
-import { nextNumber } from '../lib/numbers'
-import { dispatchTransfer, receiveTransfer } from '../lib/inventory'
-import { emitEvent } from '../lib/webhooks'
+import { prisma } from '../lib/prisma.js'
+import { audit } from '../lib/audit.js'
+import { ApiError, pagination, parse } from '../lib/http.js'
+import { canWrite } from '../lib/auth.js'
+import { nextNumber } from '../lib/numbers.js'
+import { dispatchTransfer, receiveTransfer } from '../lib/inventory.js'
+import { emitEvent } from '../lib/webhooks.js'
 
 export async function transferRoutes(app: FastifyInstance) {
   app.get('/api/transfers', async (req) => {

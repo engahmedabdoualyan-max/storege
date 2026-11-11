@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
-import { prisma } from './lib/prisma'
-import { ean13, nextNumber } from './lib/numbers'
+import { prisma } from './lib/prisma.js'
+import { ean13, nextNumber } from './lib/numbers.js'
 import {
   allocateOrder,
   createCycleCount,
@@ -9,8 +9,8 @@ import {
   pickLine,
   receiveStock,
   submitCycleCount,
-} from './lib/inventory'
-import { updateSettings } from './lib/settings'
+} from './lib/inventory.js'
+import { updateSettings } from './lib/settings.js'
 
 const rng = (() => {
   let seed = 42
@@ -580,7 +580,7 @@ async function main() {
       }
       await packLine({ soLineId: line.id, qty: line.qty })
     }
-    const { shipOrder } = await import('./lib/inventory')
+    const { shipOrder } = await import('./lib/inventory.js')
     await shipOrder({ soId: so6.id, carrier: 'أرامكس', tracking: 'ARX-2026-88421', userId: users[2].id, userName: users[2].name })
   }
 

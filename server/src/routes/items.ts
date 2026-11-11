@@ -1,12 +1,12 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { parse as parseCsv } from 'csv-parse/sync'
-import { prisma } from '../lib/prisma'
-import { audit } from '../lib/audit'
-import { ApiError, num, pagination, parse, str, toCsv } from '../lib/http'
-import { canManage, canWrite } from '../lib/auth'
-import { ean13 } from '../lib/numbers'
-import { emitEvent } from '../lib/webhooks'
+import { prisma } from '../lib/prisma.js'
+import { audit } from '../lib/audit.js'
+import { ApiError, num, pagination, parse, str, toCsv } from '../lib/http.js'
+import { canManage, canWrite } from '../lib/auth.js'
+import { ean13 } from '../lib/numbers.js'
+import { emitEvent } from '../lib/webhooks.js'
 
 const itemSchema = z.object({
   sku: z.string().min(1).optional(),

@@ -21,6 +21,7 @@ model User {
   lastLoginAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  laborTasks   LaborTask[]
 }
 
 // ---------------------------------------------------------------- network
@@ -40,6 +41,9 @@ model Warehouse {
   salesOrders     SalesOrder[]
   transfersOut    Transfer[]      @relation("TransferFrom")
   transfersIn     Transfer[]      @relation("TransferTo")
+  returns         Return[]
+  dockAppointments DockAppointment[]
+  yardSpots       YardSpot[]
   cycleCounts     CycleCount[]
   receipts        Receipt[]
 }
@@ -73,6 +77,8 @@ model Location {
   zone        Zone?     @relation(fields: [zoneId], references: [id], onDelete: SetNull)
   stocks      Stock[]
   receiptLines ReceiptLine[]
+  returnLines  ReturnLine[]
+  dockAppointments DockAppointment[]
   allocations Allocation[]
   countLines  CycleCountLine[]
   movementsFrom StockMovement[] @relation("MovementFrom")
@@ -120,6 +126,7 @@ model Item {
   category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   stocks      Stock[]
   lots        Lot[]
+  returnLines ReturnLine[]
   serials     Serial[]
   poLines     PurchaseOrderLine[]
   receiptLines ReceiptLine[]
@@ -224,6 +231,7 @@ model PurchaseOrder {
   warehouseId String
   status      String              @default("OPEN") // OPEN | PARTIAL | RECEIVED | CANCELLED
   expectedAt  DateTime?
+  asnNumber   String?
   notes       String?
   subtotal    Float               @default(0)
   taxRate     Float               @default(0)
@@ -283,6 +291,8 @@ model ReceiptLine {
   expiryDate DateTime?
   serials    String?
   qty        Float
+  qcStatus   String   @default("PENDING")
+  qcNotes    String?
   receipt    Receipt           @relation(fields: [receiptId], references: [id], onDelete: Cascade)
   poLine     PurchaseOrderLine? @relation(fields: [poLineId], references: [id], onDelete: SetNull)
   item       Item              @relation(fields: [itemId], references: [id])
@@ -588,4 +598,86 @@ model ProcessedOperation {
   userId    String?
   result    String
   createdAt DateTime @default(now())
+}
+
+
+// ---------------------------------------------------------------- returns / RMA
+model Return {
+  id           String       @id @default(cuid())
+  number       String       @unique
+  type         String       @default("CUSTOMER") // CUSTOMER | SUPPLIER
+  partnerName  String
+  partnerId    String?
+  warehouseId  String
+  status       String       @default("DRAFT") // DRAFT | RECEIVED | COMPLETED | CANCELLED
+  reason       String?
+  notes        String?
+  createdById  String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  warehouse    Warehouse    @relation(fields: [warehouseId], references: [id])
+  lines        ReturnLine[]
+}
+
+model ReturnLine {
+  id             String    @id @default(cuid())
+  returnId       String
+  itemId         String
+  qty            Float
+  disposition    String    @default("QUARANTINE") // RESTOCK | SCRAP | QUARANTINE
+  locationId     String?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  return         Return    @relation(fields: [returnId], references: [id], onDelete: Cascade)
+  item           Item      @relation(fields: [itemId], references: [id])
+  location       Location? @relation(fields: [locationId], references: [id])
+}
+
+
+// ---------------------------------------------------------------- dock scheduling
+model DockAppointment {
+  id             String    @id @default(cuid())
+  number         String    @unique
+  warehouseId    String
+  dockLocationId String?
+  carrierName    String?
+  truckPlate     String?
+  appointmentAt  DateTime
+  status         String    @default("SCHEDULED") // SCHEDULED | ARRIVED | DOCKED | COMPLETED | CANCELLED
+  notes          String?
+  createdById    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  warehouse      Warehouse @relation(fields: [warehouseId], references: [id])
+  dock           Location? @relation(fields: [dockLocationId], references: [id])
+}
+
+
+// ---------------------------------------------------------------- labor tracking
+model LaborTask {
+  id          String    @id @default(cuid())
+  userId      String
+  userName    String
+  taskType    String    // PICK | PUTAWAY | COUNT | RECEIVE
+  refType     String?
+  refId       String?
+  qty         Float     @default(0)
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime?
+  durationSec Int?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+}
+
+// ---------------------------------------------------------------- yard spots
+model YardSpot {
+  id          String    @id @default(cuid())
+  code        String
+  warehouseId String
+  status      String    @default("EMPTY") // EMPTY | OCCUPIED
+  trailerPlate String?
+  arrivalAt   DateTime?
+  createdAt   DateTime  @default(now())
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  @@unique([warehouseId, code])
 }

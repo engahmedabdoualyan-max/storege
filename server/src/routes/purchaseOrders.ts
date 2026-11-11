@@ -1,13 +1,13 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
-import { audit } from '../lib/audit'
-import { ApiError, pagination, parse, str } from '../lib/http'
-import { canWrite } from '../lib/auth'
-import { nextNumber } from '../lib/numbers'
-import { getSettings } from '../lib/settings'
-import { emitEvent } from '../lib/webhooks'
-import { consumeAt, receiveStock, round3 } from '../lib/inventory'
+import { prisma } from '../lib/prisma.js'
+import { audit } from '../lib/audit.js'
+import { ApiError, pagination, parse, str } from '../lib/http.js'
+import { canWrite } from '../lib/auth.js'
+import { nextNumber } from '../lib/numbers.js'
+import { getSettings } from '../lib/settings.js'
+import { emitEvent } from '../lib/webhooks.js'
+import { allocateOrder, consumeAt, receiveStock, round3 } from '../lib/inventory.js'
 
 const lineSchema = z.object({
   itemId: z.string(),
@@ -184,6 +184,7 @@ export async function purchaseOrderRoutes(app: FastifyInstance) {
       z.object({
         locationId: z.string().optional().nullable(),
         notes: z.string().optional().nullable(),
+        crossDock: z.boolean().optional(),
         lines: z
           .array(
             z.object({
@@ -287,6 +288,21 @@ export async function purchaseOrderRoutes(app: FastifyInstance) {
     })
 
     await refreshPoStatus(po.id)
+
+    if (body.crossDock) {
+      const itemIds = [...new Set(body.lines.map((l) => l.itemId).filter(Boolean))] as string[]
+      if (itemIds.length) {
+        const orders = await prisma.salesOrder.findMany({
+          where: { warehouseId: po.warehouseId, status: { in: ['OPEN', 'ALLOCATED'] } },
+          include: { lines: true },
+        })
+        const affected = orders.filter((so) => so.lines.some((l) => itemIds.includes(l.itemId)))
+        for (const so of affected) {
+          try { await allocateOrder(so.id, req.auth!.id, true) } catch { /* ignore */ }
+        }
+      }
+    }
+
     const full = await prisma.receipt.findUnique({
       where: { id: receipt.id },
       include: {
@@ -434,7 +450,7 @@ export async function purchaseOrderRoutes(app: FastifyInstance) {
       }),
       req.body,
     )
-    const { moveStock } = await import('../lib/inventory')
+    const { moveStock } = await import('../lib/inventory.js')
     const chunks = await prisma.$transaction(async (tx) =>
       moveStock(tx, {
         ...body,

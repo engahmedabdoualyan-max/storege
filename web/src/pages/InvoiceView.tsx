@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowRight, Banknote, Building2, Mail, MapPin, Phone, Printer, XCircle } from 'lucide-react'
+import { ArrowRight, Banknote, Building2, Download, Mail, MapPin, Phone, Printer, QrCode as QrIcon, XCircle } from 'lucide-react'
 import {
   Alert,
   Button,
@@ -34,6 +34,7 @@ export default function InvoiceView() {
   const toast = useToast()
   const queryClient = useQueryClient()
   const [payOpen, setPayOpen] = useState(false)
+  const [zatcaOpen, setZatcaOpen] = useState(false)
   const [amount, setAmount] = useState('')
 
   const { data, isLoading, refetch } = useQuery({
@@ -44,6 +45,12 @@ export default function InvoiceView() {
 
   const invoice = data?.invoice
   const company = data?.company || {}
+
+  const zatcaQuery = useQuery({
+    queryKey: ['zatca', id],
+    queryFn: () => api.get<{ qr: string; xml: string; seller: string; vatNumber: string; total: number; vatTotal: number }>(`/api/invoices/${id}/zatca`),
+    enabled: zatcaOpen,
+  })
 
   const payMutation = useMutation({
     mutationFn: () => api.post(`/api/invoices/${id}/pay`, { amount: Number(amount) }),
@@ -96,6 +103,9 @@ export default function InvoiceView() {
           <>
             <Button variant="secondary" onClick={() => window.print()}>
               <Printer size={15} /> {t('طباعة الفاتورة')}
+            </Button>
+            <Button variant="secondary" onClick={() => setZatcaOpen(true)}>
+              <QrIcon size={15} /> {t('ZATCA QR')}
             </Button>
             {can('MANAGER', 'OPERATOR') && !['PAID', 'CANCELLED'].includes(invoice.status) ? (
               <Button
@@ -311,6 +321,42 @@ export default function InvoiceView() {
             autoFocus
           />
         </Field>
+      </Modal>
+    
+      <Modal open={zatcaOpen} onClose={() => setZatcaOpen(false)} title={t('ZATCA - رمز QR')} subtitle={t('فاتورة ضريبية مبسطة (المرحلة 2)')}>
+        <div className="space-y-4">
+          {zatcaQuery.isLoading ? (
+            <Spinner label={t('جاري التحميل...')} />
+          ) : zatcaQuery.data ? (
+            <>
+              <div className="flex justify-center rounded-xl border border-slate-200 bg-white p-4">
+                <QrCode value={zatcaQuery.data.qr} size={200} />
+              </div>
+              <div className="grid gap-2 text-xs text-slate-600 sm:grid-cols-2">
+                <p><b>{t('البائع')}:</b> {zatcaQuery.data.seller}</p>
+                <p><b>{t('الرقم الضريبي')}:</b> {zatcaQuery.data.vatNumber}</p>
+                <p><b>{t('الإجمالي')}:</b> {money(zatcaQuery.data.total, lang)}</p>
+                <p><b>{t('الضريبة')}:</b> {money(zatcaQuery.data.vatTotal, lang)}</p>
+              </div>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  const blob = new Blob([zatcaQuery.data!.xml], { type: 'application/xml' })
+                  const url = URL.createObjectURL(blob)
+                  const a = document.createElement('a')
+                  a.href = url
+                  a.download = `${invoice.number}-zatca.xml`
+                  a.click()
+                  URL.revokeObjectURL(url)
+                }}
+              >
+                <Download size={15} /> {t('تحميل XML')}
+              </Button>
+            </>
+          ) : (
+            <p className="text-sm text-slate-500">{t('تعذر تحميل بيانات ZATCA')}</p>
+          )}
+        </div>
       </Modal>
     </div>
   )

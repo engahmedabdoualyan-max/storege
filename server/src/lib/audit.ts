@@ -1,5 +1,5 @@
 import type { FastifyRequest } from 'fastify'
-import { prisma } from './prisma'
+import { prisma } from './prisma.js'
 
 export async function audit(
   req: FastifyRequest | null,

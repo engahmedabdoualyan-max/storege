@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { createHash } from 'node:crypto'
-import { prisma } from './prisma'
-import { ApiError } from './http'
+import { prisma } from './prisma.js'
+import { ApiError } from './http.js'
 
 export type Role = 'ADMIN' | 'MANAGER' | 'OPERATOR' | 'VIEWER'
 

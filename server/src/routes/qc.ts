@@ -1,9 +1,9 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
-import { ApiError, pagination, parse } from '../lib/http'
-import { canWrite } from '../lib/auth'
-import { audit } from '../lib/audit'
+import { prisma } from '../lib/prisma.js'
+import { ApiError, pagination, parse } from '../lib/http.js'
+import { canWrite } from '../lib/auth.js'
+import { audit } from '../lib/audit.js'
 
 export async function qcRoutes(app: FastifyInstance) {
   app.get('/api/qc', async (req) => {

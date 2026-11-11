@@ -1,13 +1,13 @@
 import type { FastifyInstance } from 'fastify'
 import { randomBytes } from 'node:crypto'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
-import { audit } from '../lib/audit'
-import { ApiError, pagination, parse, toCsv } from '../lib/http'
-import { adminOnly, canManage } from '../lib/auth'
-import { getSettings, updateSettings } from '../lib/settings'
-import { hashToken } from '../lib/auth'
-import { testEndpoint, processPendingDeliveries } from '../lib/webhooks'
+import { prisma } from '../lib/prisma.js'
+import { audit } from '../lib/audit.js'
+import { ApiError, pagination, parse, toCsv } from '../lib/http.js'
+import { adminOnly, canManage } from '../lib/auth.js'
+import { getSettings, updateSettings } from '../lib/settings.js'
+import { hashToken } from '../lib/auth.js'
+import { testEndpoint, processPendingDeliveries } from '../lib/webhooks.js'
 
 export async function platformRoutes(app: FastifyInstance) {
   // ------------------------------------------------------------- settings

@@ -1,9 +1,9 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
-import { audit } from '../lib/audit'
-import { ApiError, pagination, parse, str } from '../lib/http'
-import { canManage, canWrite } from '../lib/auth'
+import { prisma } from '../lib/prisma.js'
+import { audit } from '../lib/audit.js'
+import { ApiError, pagination, parse, str } from '../lib/http.js'
+import { canManage, canWrite } from '../lib/auth.js'
 
 const warehouseSchema = z.object({
   code: z.string().min(1),
@@ -319,7 +319,7 @@ export async function warehouseRoutes(app: FastifyInstance) {
 
   // ------------------------------------------------------ settings / branding
   app.get('/api/settings/public', async () => {
-    const { getSettings } = await import('../lib/settings')
+    const { getSettings } = await import('../lib/settings.js')
     const settings = await getSettings()
     return {
       companyName: settings.companyName,

@@ -7,28 +7,30 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ZodError } from 'zod'
-import { prisma } from './lib/prisma'
-import { ApiError } from './lib/http'
-import { authenticate } from './lib/auth'
-import { env } from './lib/env'
-import { processPendingDeliveries } from './lib/webhooks'
-import { authRoutes } from './routes/auth'
-import { userRoutes } from './routes/users'
-import { itemRoutes } from './routes/items'
-import { qcRoutes } from './routes/qc'
-import { warehouseRoutes } from './routes/warehouses'
-import { inventoryRoutes } from './routes/inventory'
-import { partnerRoutes } from './routes/partners'
-import { purchaseOrderRoutes } from './routes/purchaseOrders'
-import { salesOrderRoutes } from './routes/salesOrders'
-import { transferRoutes } from './routes/transfers'
-import { cycleCountRoutes } from './routes/cycleCounts'
-import { invoiceRoutes } from './routes/invoices'
-import { dashboardRoutes } from './routes/dashboard'
-import { dockRoutes } from './routes/docks'
-import { reportRoutes } from './routes/reports'
-import { returnRoutes } from './routes/returns'
-import { platformRoutes } from './routes/platform'
+import { prisma } from './lib/prisma.js'
+import { ApiError } from './lib/http.js'
+import { authenticate } from './lib/auth.js'
+import { env } from './lib/env.js'
+import { processPendingDeliveries } from './lib/webhooks.js'
+import { authRoutes } from './routes/auth.js'
+import { userRoutes } from './routes/users.js'
+import { itemRoutes } from './routes/items.js'
+import { laborRoutes } from './routes/labor.js'
+import { yardRoutes } from './routes/yard.js'
+import { qcRoutes } from './routes/qc.js'
+import { warehouseRoutes } from './routes/warehouses.js'
+import { inventoryRoutes } from './routes/inventory.js'
+import { partnerRoutes } from './routes/partners.js'
+import { purchaseOrderRoutes } from './routes/purchaseOrders.js'
+import { salesOrderRoutes } from './routes/salesOrders.js'
+import { transferRoutes } from './routes/transfers.js'
+import { cycleCountRoutes } from './routes/cycleCounts.js'
+import { invoiceRoutes } from './routes/invoices.js'
+import { dashboardRoutes } from './routes/dashboard.js'
+import { dockRoutes } from './routes/docks.js'
+import { reportRoutes } from './routes/reports.js'
+import { returnRoutes } from './routes/returns.js'
+import { platformRoutes } from './routes/platform.js'
 
 const PUBLIC_PATHS = new Set(['/api/auth/login', '/api/health', '/api/settings/public'])
 
@@ -143,6 +145,8 @@ app.get('/api/health', async () => {
 await app.register(authRoutes)
 await app.register(userRoutes)
 await app.register(itemRoutes)
+await app.register(laborRoutes)
+await app.register(yardRoutes)
 await app.register(qcRoutes)
 await app.register(warehouseRoutes)
 await app.register(inventoryRoutes)

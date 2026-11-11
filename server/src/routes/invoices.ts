@@ -1,12 +1,12 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
-import { audit } from '../lib/audit'
-import { ApiError, pagination, parse } from '../lib/http'
-import { canWrite } from '../lib/auth'
-import { nextNumber } from '../lib/numbers'
-import { getSettings } from '../lib/settings'
-import { emitEvent } from '../lib/webhooks'
+import { prisma } from '../lib/prisma.js'
+import { audit } from '../lib/audit.js'
+import { ApiError, pagination, parse } from '../lib/http.js'
+import { canWrite } from '../lib/auth.js'
+import { nextNumber } from '../lib/numbers.js'
+import { getSettings } from '../lib/settings.js'
+import { emitEvent } from '../lib/webhooks.js'
 
 export async function invoiceRoutes(app: FastifyInstance) {
   app.get('/api/invoices', async (req) => {
@@ -69,6 +69,39 @@ export async function invoiceRoutes(app: FastifyInstance) {
       partner = await prisma.supplier.findUnique({ where: { id: invoice.partnerId } })
     }
     return { invoice, company, partner }
+  })
+
+  app.get('/api/invoices/:id/zatca', async (req) => {
+    const { id } = req.params as { id: string }
+    const invoice = await prisma.invoice.findUnique({ where: { id }, include: { lines: { include: { item: true } } } })
+    if (!invoice) throw new ApiError(404, 'الفاتورة غير موجودة')
+    const company = await getSettings()
+    const tlv = (tag: number, value: string) => {
+      const bytes = Buffer.from(value, 'utf8')
+      return Buffer.concat([Buffer.from([tag]), Buffer.from([bytes.length]), bytes])
+    }
+    const timestamp = new Date(invoice.date).toISOString()
+    const payload = Buffer.concat([
+      tlv(1, company.companyName),
+      tlv(2, company.companyTaxNumber),
+      tlv(3, timestamp),
+      tlv(4, invoice.total.toFixed(2)),
+      tlv(5, invoice.taxAmount.toFixed(2)),
+    ])
+    const qr = payload.toString('base64')
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">
+  <cbc:ID xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">${invoice.number}</cbc:ID>
+  <cbc:UUID xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">${invoice.id}</cbc:UUID>
+  <cbc:IssueDate xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">${new Date(invoice.date).toISOString().slice(0, 10)}</cbc:IssueDate>
+  <cac:AccountingSupplierParty xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2">
+    <cac:Party><cac:PartyName><cbc:Name xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">${company.companyName}</cbc:Name></cac:PartyName></cac:Party>
+  </cac:AccountingSupplierParty>
+  <cac:LegalMonetaryTotal xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2">
+    <cbc:PayableAmount xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" currencyID="${company.currency || 'SAR'}">${invoice.total.toFixed(2)}</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+</Invoice>`
+    return { qr, xml, timestamp, seller: company.companyName, vatNumber: company.companyTaxNumber, total: invoice.total, vatTotal: invoice.taxAmount }
   })
 
   app.post('/api/invoices', { preHandler: [canWrite] }, async (req) => {

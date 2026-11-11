@@ -40,7 +40,6 @@ public class MainActivity extends Activity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 String host = uri.getHost();
-                // Keep the app domain inside the WebView; open everything else externally.
                 if (host != null && (host.endsWith("vercel.app") || host.endsWith("storege.sa"))) {
                     return false;
                 }
@@ -71,25 +70,3 @@ public class MainActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 }
-EOF
-mkdir -p /home/dr-ahmed/Documents/storege/android/app/src/main/res/layout
-cat > /home/dr-ahmed/Documents/storege/android/app/src/main/res/layout/activity_main.xml <<'EOF'
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/swipe"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <WebView
-        android:id="@+id/webview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-EOF
-cat > /home/dr-ahmed/Documents/storege/android/app/src/main/res/values/strings.xml <<'EOF'
-<resources>
-    <string name="app_name">Storege WMS</string>
-</resources>
-EOF
-echo done

@@ -382,7 +382,7 @@ export function Modal({
       />
       <div
         className={cx(
-          'relative z-10 my-auto w-full rounded-2xl bg-white shadow-pop animate-fade-in',
+          'relative z-10 my-auto w-full max-w-[95vw] rounded-2xl bg-white shadow-pop animate-fade-in',
           widths[size],
         )}
       >
@@ -426,7 +426,7 @@ export function DataTable({
   const t = useT()
   return (
     <div className={cx('overflow-x-auto', className)}>
-      <table className="w-full min-w-[640px] border-collapse text-sm">
+      <table className="w-full min-w-[520px] border-collapse text-sm">
         <thead>
           <tr className="border-b border-slate-200 bg-slate-50/70 text-start">
             {headers.map((header, index) => (
